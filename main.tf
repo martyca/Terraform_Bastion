@@ -72,6 +72,10 @@ data "aws_ami" "amazon-linux-2" {
   }
 }
 
+data "template_file" "user_data" {
+  template = file("${path.root}/userdata.sh")
+}
+
 resource "aws_instance" "bastion" {
   ami                         = data.aws_ami.amazon-linux-2.id
   instance_type               = "t3.nano"
@@ -79,5 +83,6 @@ resource "aws_instance" "bastion" {
   subnet_id                   = aws_subnet.subnet[0].id
   key_name                    = aws_key_pair.pubkey.key_name
   vpc_security_group_ids      = [aws_security_group.allow_ssh.id]
+  user_data                   = data.template_file.user_data.rendered
 }
 
